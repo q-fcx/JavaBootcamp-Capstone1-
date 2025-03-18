@@ -25,7 +25,7 @@ public class User {
     @NotEmpty
     @Pattern(regexp = "admin|customer", message = "Role can either be admin or customer")
     private String role;
-    @NotEmpty
+    @NotNull
     @Positive
     private double balance;
 
