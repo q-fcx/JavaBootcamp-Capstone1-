@@ -35,16 +35,7 @@ public class MerchantStockService {
                 return false;
             }
         }
-        for(Product p : productService.products) {
-            if(!p.getId().equals(merchantStock.getProductId())) {
-                return false;
-            }
-                for(Merchant m : merchantService.merchants) {
-                    if(!m.getId().equals(merchantStock.getMerchantId())){
-                        return false;
-                    }
-                }
-            }
+
         merchantStocks.add(merchantStock);
         return true;
     }

@@ -60,6 +60,6 @@ public class MerchantStockController {
         if(isAdded){
             return ResponseEntity.ok("Product amount is added and stock is updated");
         }
-        return ResponseEntity.badRequest().body("something wrong");
+        return ResponseEntity.badRequest().body("Invalid Id check: merchant Id or product Id");
     }
 }

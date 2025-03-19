@@ -6,6 +6,7 @@ import org.example.capstone1_ecommerce.model.MerchantStock;
 import org.example.capstone1_ecommerce.model.Product;
 import org.example.capstone1_ecommerce.model.User;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,7 +18,10 @@ public class UserService {
     private final ProductService productService;
     private final MerchantService merchantService;
     private final MerchantStockService merchantStockService;
-    private final DiscountService discountService;
+    @Lazy
+    private DiscountService discountService;
+
+
 
     ArrayList<User> users = new ArrayList<>();
 
@@ -79,50 +83,58 @@ public class UserService {
 
     }
 
-    public boolean buyProduct(String userId, String productId, String merchantId, int amount) {
-       User user =  userSearchById(userId);
-        if (user == null) return false;
-
+    public String buyProduct(String userId, String productId, String merchantId, int amount) {
+        User user = userSearchById(userId);
+        if (user == null) {
+            return "User not found!";
+        }
         Product product = productService.productSearchById(productId);
-        if (product == null) return false;
-
+        if (product == null) {
+            return "Product not found!";
+        }
         Merchant merchant = merchantService.merchantSearchById(merchantId);
-        if (merchant == null) return false;
+        if (merchant == null) {
+            return "Merchant not found!";
+        }
 
         MerchantStock stock = merchantStockService.findMerchantStock(productId, merchantId);
-        if (stock == null) return false;
-
-        if (stock.getStock() < amount) return false;
-
+        if (stock == null) {
+            return "Product not available at this merchant!";
+        }
+        if (stock.getStock() < amount) {
+            return "Not enough stock available!";
+        }
         double totalPrice = product.getPrice() * amount;
-
         double discount = discountService.calculateTotalDiscount(userId, productId, totalPrice);
         totalPrice -= discount;
-        if (user.getBalance() < totalPrice) return false;
 
+        if (user.getBalance() < totalPrice) {
+            return "Insufficient balance!";
+        }
         user.setBalance(user.getBalance() - totalPrice);
         stock.setStock(stock.getStock() - amount);
         user.getPurchasedCategories().add(product.getCategoryId());
         user.getPurchasedProducts().add(productId);
         user.setTotalSpending(user.getTotalSpending() + totalPrice);
-
-
-        return true;
+        return "Purchase successful!";
     }
 
-
-
-    public User getTopCustomers() {
+    public String getTopCustomer(String userId) {
+        User user = userSearchById(userId);
+        if (user == null || !user.getRole().equalsIgnoreCase("admin")) {
+            return "can't access: Only admins can view the top customer.";
+        }
         User topCustomer = users.get(0);
         double maxSpending = topCustomer.getTotalSpending();
-        for(User user : users) {
-            double totalSpending = user.getTotalSpending();
-            if(totalSpending > maxSpending) {
-                topCustomer = user;
-                maxSpending = totalSpending;
+
+        for(User u : users) {
+            if (!u.getRole().equalsIgnoreCase("admin") && u.getTotalSpending() > maxSpending) {
+                topCustomer = u;
+                maxSpending = u.getTotalSpending();
+                }
+
             }
-        }
-        return topCustomer;
+        return "Top customer: " + topCustomer.getUserName() + " with spending: " + maxSpending;
     }
 }
 

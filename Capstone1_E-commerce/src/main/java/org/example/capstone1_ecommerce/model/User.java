@@ -13,10 +13,10 @@ public class User {
     @NotEmpty
     private String id;
     @NotEmpty
-    @Min(value = 5, message = "User name must be more than 5 characters")
+    //@Min(value = 5, message = "User name must be more than 5 characters")
     private String userName;
     @NotEmpty
-    @Min(value = 6, message = "Password must be more than 6")
+    //@Min(value = 6, message = "Password must be more than 6")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password must contain letters and digits")
     private String password;
     @NotEmpty
@@ -31,6 +31,7 @@ public class User {
 
     private ArrayList<String> purchasedProducts = new ArrayList<>();
     private ArrayList<String> purchasedCategories = new ArrayList<>();
+    private ArrayList<String> wishlist = new ArrayList<>();
 
     private double totalSpending;
 }

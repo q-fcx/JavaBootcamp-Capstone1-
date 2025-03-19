@@ -2,10 +2,9 @@ package org.example.capstone1_ecommerce.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.capstone1_ecommerce.model.Category;
 import org.example.capstone1_ecommerce.model.Product;
+import org.example.capstone1_ecommerce.service.DiscountService;
 import org.example.capstone1_ecommerce.service.ProductService;
-import org.example.capstone1_ecommerce.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 public class ProductController {
 
     private final ProductService productService;
+    private final DiscountService discountService;
 
     @GetMapping("/get")
     public ResponseEntity getProducts() {
@@ -55,4 +55,20 @@ public class ProductController {
         }
         return ResponseEntity.badRequest().body("Id not found");
     }
+
+    @GetMapping("/categoryDiscount/{productId}")
+    public ResponseEntity categoryBasedDiscount(@PathVariable String productId) {
+        double discount = discountService.categoryDiscount(productId);
+        if(discount == 0) {
+            ResponseEntity.status(400).body("No discount applied");
+        }
+        return ResponseEntity.status(200).body("Category discount applied successfully");
+    }
+
+    @GetMapping("/totalDiscount/{userId}/{productId}/{price}")
+    public ResponseEntity totalDiscount(@PathVariable String userId, @PathVariable String productId, @PathVariable double price) {
+       discountService.calculateTotalDiscount(userId, productId, price);
+        return ResponseEntity.status(200).body("Total Discount is Calculated and applied");
+    }
+
 }
